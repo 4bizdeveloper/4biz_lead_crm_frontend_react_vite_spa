@@ -15,7 +15,7 @@ interface Lead {
 
 // Helper hook to handle multi-device responsiveness without external CSS media queries
 function useWindowWidth() {
-  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
   
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -28,11 +28,11 @@ function useWindowWidth() {
 
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('crm_token'));
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const width = useWindowWidth();
   const isMobile = width < 640;
@@ -72,9 +72,9 @@ export default function App() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/crm/leads?token=${token}`);
       if (!res.ok) throw new Error('Session expired. Please log in again.');
-      const data = await res.json();
+      const data: Lead[] = await res.json();
       setLeads(data);
-    } catch (err) {
+    } catch (err: unknown) {
       handleLogout();
     } finally {
       setLoading(false);
@@ -89,9 +89,9 @@ export default function App() {
         body: JSON.stringify({ status: newStatus })
       });
       if (res.ok) {
-        setLeads(leads.map(l => l.id === id ? { ...l, status: newStatus } : l));
+        setLeads(prev => prev.map(l => l.id === id ? { ...l, status: newStatus } : l));
       }
-    } catch (err) {
+    } catch (err: unknown) {
       alert("Error updating status profile");
     }
   };
@@ -154,7 +154,7 @@ export default function App() {
               src="/favicon.png" 
               alt="CRM Logo" 
               style={{ height: '48px', width: 'auto', objectFit: 'contain' }} 
-              onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.style.display = 'none'; }} 
             />
           </div>
           <h2 style={{
@@ -189,7 +189,7 @@ export default function App() {
                 type="text" 
                 placeholder="Username" 
                 value={username} 
-                onChange={e => setUsername(e.target.value)} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)} 
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -207,7 +207,7 @@ export default function App() {
                 type="password" 
                 placeholder="Password" 
                 value={password} 
-                onChange={e => setPassword(e.target.value)} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} 
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -238,8 +238,8 @@ export default function App() {
                 cursor: 'pointer',
                 transition: 'background-color 0.2s',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.emerald700}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.emerald600}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = colors.emerald700}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.backgroundColor = colors.emerald600}
             >
               <LogIn size={18}/> Access Dashboard
             </button>
@@ -278,7 +278,7 @@ export default function App() {
               width: 'auto', 
               objectFit: 'contain' 
             }} 
-            onError={(e) => {
+            onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
               e.currentTarget.style.display = 'none';
               const altSpan = document.getElementById('nav-fallback-text');
               if (altSpan) altSpan.style.display = 'block';
@@ -315,8 +315,8 @@ export default function App() {
             transition: 'background-color 0.15s',
             whiteSpace: 'nowrap'
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fef2f2'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = '#fef2f2'; }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
           <LogOut size={isMobile ? 14 : 16} /> Sign Out
         </button>
@@ -325,7 +325,7 @@ export default function App() {
       {/* Main Container */}
       <main style={{
         padding: isMobile ? '16px' : isTablet ? '24px 20px' : '40px 32px',
-        maxWidth: '1400px',
+        maxWidth: isDesktop ? '1400px' : '100%',
         margin: '0 auto',
         boxSizing: 'border-box'
       }}>
@@ -374,11 +374,11 @@ export default function App() {
 
         {/* Dynamic Multi-Device Layout Container */}
         {isMobile ? (
-          /* Mobile View: High-Fidelity Modern CRM Cards */
+          /* Mobile View: High-Fidelity Responsive Cards */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {leads.length === 0 ? (
               <div style={{ padding: '40px 20px', textAlign: 'center', backgroundColor: colors.white, borderRadius: '12px', color: colors.slate500 }}>No leads available.</div>
-            ) : leads.map((lead) => {
+            ) : leads.map((lead: Lead) => {
               const badge = getStatusStyles(lead.status);
               return (
                 <div key={lead.id} style={{
@@ -440,7 +440,7 @@ export default function App() {
                     <span style={{ fontSize: '13px', color: colors.slate600, fontWeight: 600 }}>Update Status:</span>
                     <select 
                       value={lead.status} 
-                      onChange={(e) => updateStatus(lead.id, e.target.value)} 
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateStatus(lead.id, e.target.value)} 
                       style={{
                         padding: '6px 10px',
                         border: `1px solid ${colors.slate200}`,
@@ -463,7 +463,7 @@ export default function App() {
             })}
           </div>
         ) : (
-          /* Tablet & Desktop View: Table Container with Horizontal Scroll */
+          /* Tablet & Desktop View: Table with Horizontal Scroll Support */
           <div style={{
             backgroundColor: colors.white,
             borderRadius: '16px',
@@ -486,7 +486,7 @@ export default function App() {
                   <tr>
                     <td colSpan={4} style={{ padding: '40px', textAlign: 'center', color: colors.slate500, fontWeight: 500 }}>No record entries currently inside dashboard folder.</td>
                   </tr>
-                ) : leads.map((lead, index) => {
+                ) : leads.map((lead: Lead, index: number) => {
                   const badge = getStatusStyles(lead.status);
                   return (
                     <tr 
@@ -496,8 +496,8 @@ export default function App() {
                         backgroundColor: colors.white,
                         transition: 'background-color 0.15s'
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.slate50; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = colors.white; }}
+                      onMouseEnter={(e: React.MouseEvent<HTMLTableRowElement>) => { e.currentTarget.style.backgroundColor = colors.slate50; }}
+                      onMouseLeave={(e: React.MouseEvent<HTMLTableRowElement>) => { e.currentTarget.style.backgroundColor = colors.white; }}
                     >
                       <td style={{ padding: '18px 20px', verticalAlign: 'top' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -553,7 +553,7 @@ export default function App() {
                       <td style={{ padding: '18px 20px', textAlign: 'right', verticalAlign: 'top' }}>
                         <select 
                           value={lead.status} 
-                          onChange={(e) => updateStatus(lead.id, e.target.value)} 
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateStatus(lead.id, e.target.value)} 
                           style={{
                             padding: '8px 12px',
                             border: `1px solid ${colors.slate200}`,
