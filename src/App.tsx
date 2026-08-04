@@ -27,9 +27,6 @@ function useWindowWidth() {
 }
 
 export default function App() {
-  // Prevent React unused import warning by referencing it safely or relying on TS6133 bypass if needed. 
-  // By using React.FormEvent, the React import is explicitly used.
-  
   const [token, setToken] = useState<string | null>(localStorage.getItem('crm_token'));
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -40,7 +37,7 @@ export default function App() {
   const width = useWindowWidth();
   const isMobile = width < 640;
   const isTablet = width >= 640 && width < 1024;
-  const isDesktop = width >= 1024; // Reference kept intact to resolve TS6133 error
+  const isDesktop = width >= 1024;
 
   useEffect(() => {
     if (token) fetchLeads();
@@ -118,7 +115,7 @@ export default function App() {
     }
   };
 
-  // --- Theme Styles Config ---
+  // Theme Styles Config
   const colors = {
     slate900: '#0f172a',
     slate800: '#1e293b',
@@ -152,7 +149,6 @@ export default function App() {
           width: '100%',
           maxWidth: '420px',
         }}>
-          {/* Auth Header with Image Logo */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
             <img 
               src="/favicon.png" 
@@ -262,7 +258,7 @@ export default function App() {
       margin: 0,
       padding: 0
     }}>
-      {/* Navigation Topbar - Optimized for Single Row Responsiveness across all devices */}
+      {/* Navigation Topbar */}
       <nav style={{
         backgroundColor: colors.white,
         borderBottom: `1px solid ${colors.slate200}`,
@@ -270,7 +266,7 @@ export default function App() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        flexDirection: 'row', // Maintained row alignment for mobile/tablet layout
+        flexDirection: 'row',
         gap: '12px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -283,7 +279,6 @@ export default function App() {
               objectFit: 'contain' 
             }} 
             onError={(e) => {
-              // Fallback text if image path isn't mapped properly
               e.currentTarget.style.display = 'none';
               const altSpan = document.getElementById('nav-fallback-text');
               if (altSpan) altSpan.style.display = 'block';
@@ -300,9 +295,6 @@ export default function App() {
             CRM
           </span>
         </div>
-        
-        {/* Referencing isDesktop here silently to prevent TS6133 unused error without breaking any functionality */}
-        <div style={{ display: 'none' }}>{isDesktop}</div>
 
         <button 
           onClick={handleLogout} 
@@ -318,7 +310,7 @@ export default function App() {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            width: 'auto', // Kept size concise, non full-width
+            width: 'auto',
             justifyContent: 'center',
             transition: 'background-color 0.15s',
             whiteSpace: 'nowrap'
@@ -332,7 +324,7 @@ export default function App() {
 
       {/* Main Container */}
       <main style={{
-        padding: isMobile ? '20px 16px' : '40px 32px',
+        padding: isMobile ? '16px' : isTablet ? '24px 20px' : '40px 32px',
         maxWidth: '1400px',
         margin: '0 auto',
         boxSizing: 'border-box'
@@ -341,8 +333,8 @@ export default function App() {
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '32px',
+          alignItems: isMobile ? 'stretch' : 'center',
+          marginBottom: '24px',
           flexDirection: isMobile ? 'column' : 'row',
           gap: isMobile ? '16px' : '0px',
           textAlign: isMobile ? 'center' : 'left'
@@ -368,7 +360,6 @@ export default function App() {
             }}
           >
             <RefreshCw 
-              className={loading ? "animate-spin" : ""} 
               size={18} 
               style={{ 
                 color: colors.slate700,
@@ -381,10 +372,10 @@ export default function App() {
           </button>
         </div>
 
-        {/* Dynamic Multi-Device Layout Grid Container */}
+        {/* Dynamic Multi-Device Layout Container */}
         {isMobile ? (
           /* Mobile View: High-Fidelity Modern CRM Cards */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {leads.length === 0 ? (
               <div style={{ padding: '40px 20px', textAlign: 'center', backgroundColor: colors.white, borderRadius: '12px', color: colors.slate500 }}>No leads available.</div>
             ) : leads.map((lead) => {
@@ -393,38 +384,38 @@ export default function App() {
                 <div key={lead.id} style={{
                   backgroundColor: colors.white,
                   borderRadius: '16px',
-                  padding: '20px',
+                  padding: '16px',
                   border: `1px solid ${colors.slate200}`,
                   boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxWidth: '100%', wordBreak: 'break-word' }}>
                       <div style={{ fontSize: '14px', color: colors.slate700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <User size={14} style={{ color: colors.slate500 }} />
+                        <User size={14} style={{ color: colors.slate500, flexShrink: 0 }} />
                         <span style={{ fontWeight: 500, color: colors.slate500 }}>Name:</span> 
-                        <span style={{ fontWeight: 700, color: colors.slate900, fontSize: '16px' }}>{lead.name}</span>
+                        <span style={{ fontWeight: 700, color: colors.slate900, fontSize: '15px' }}>{lead.name}</span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: colors.slate700 }}>
-                        <Mail size={14} style={{ color: colors.slate500 }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: colors.slate700, wordBreak: 'break-all' }}>
+                        <Mail size={14} style={{ color: colors.slate500, flexShrink: 0 }} />
                         <span style={{ fontWeight: 500, color: colors.slate500 }}>Email:</span>
                         <span style={{ color: colors.emerald600, fontWeight: 500 }}>{lead.email}</span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: colors.slate700 }}>
-                        <Phone size={14} style={{ color: colors.slate500 }} />
-                        <span style={{ fontWeight: 500, color: colors.slate500 }}>Phone Number:</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: colors.slate700 }}>
+                        <Phone size={14} style={{ color: colors.slate500, flexShrink: 0 }} />
+                        <span style={{ fontWeight: 500, color: colors.slate500 }}>Phone:</span>
                         <span style={{ fontWeight: 600 }}>{lead.phone}</span>
                       </div>
                     </div>
                     <span style={{
                       backgroundColor: badge.bg,
                       color: badge.text,
-                      padding: '6px 12px',
+                      padding: '4px 10px',
                       borderRadius: '50px',
                       fontSize: '12px',
                       fontWeight: 700,
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '6px',
+                      gap: '4px',
                       whiteSpace: 'nowrap'
                     }}>
                       {badge.icon} {lead.status}
@@ -433,24 +424,25 @@ export default function App() {
                   
                   <div style={{
                     backgroundColor: colors.slate50,
-                    padding: '12px 16px',
+                    padding: '10px 14px',
                     borderRadius: '10px',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     color: colors.slate700,
-                    marginBottom: '18px',
+                    marginBottom: '14px',
                     borderLeft: `4px solid ${colors.slate200}`,
-                    lineHeight: '1.5'
+                    lineHeight: '1.5',
+                    wordBreak: 'break-word'
                   }}>
                     <strong style={{ color: colors.slate800 }}>Message:</strong> {lead.message || "—"}
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${colors.slate100}`, paddingTop: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${colors.slate100}`, paddingTop: '12px' }}>
                     <span style={{ fontSize: '13px', color: colors.slate600, fontWeight: 600 }}>Update Status:</span>
                     <select 
                       value={lead.status} 
                       onChange={(e) => updateStatus(lead.id, e.target.value)} 
                       style={{
-                        padding: '8px 12px',
+                        padding: '6px 10px',
                         border: `1px solid ${colors.slate200}`,
                         borderRadius: '8px',
                         fontSize: '13px',
@@ -471,21 +463,22 @@ export default function App() {
             })}
           </div>
         ) : (
-          /* Tablet & Desktop View: Precision Structured CRM Table Data Layer */
+          /* Tablet & Desktop View: Table Container with Horizontal Scroll */
           <div style={{
             backgroundColor: colors.white,
             borderRadius: '16px',
             border: `1px solid ${colors.slate200}`,
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-            overflow: 'hidden'
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch'
           }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
               <thead>
                 <tr style={{ backgroundColor: colors.slate50, borderBottom: `1px solid ${colors.slate200}` }}>
-                  <th style={{ padding: '18px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: colors.slate500, letterSpacing: '0.05em' }}>Contact Details</th>
-                  <th style={{ padding: '18px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: colors.slate500, letterSpacing: '0.05em' }}>Message Log</th>
-                  <th style={{ padding: '18px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: colors.slate500, letterSpacing: '0.05em' }}>Status Lifecycle</th>
-                  <th style={{ padding: '18px 24px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: colors.slate500, letterSpacing: '0.05em', textAlign: 'right' }}>System Actions</th>
+                  <th style={{ padding: '16px 20px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: colors.slate500, letterSpacing: '0.05em', width: '30%' }}>Contact Details</th>
+                  <th style={{ padding: '16px 20px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: colors.slate500, letterSpacing: '0.05em', width: '35%' }}>Message Log</th>
+                  <th style={{ padding: '16px 20px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: colors.slate500, letterSpacing: '0.05em', width: '18%' }}>Status Lifecycle</th>
+                  <th style={{ padding: '16px 20px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: colors.slate500, letterSpacing: '0.05em', textAlign: 'right', width: '17%' }}>System Actions</th>
                 </tr>
               </thead>
               <tbody style={{ fontSize: '14px' }}>
@@ -506,23 +499,23 @@ export default function App() {
                       onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.slate50; }}
                       onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = colors.white; }}
                     >
-                      <td style={{ padding: '24px', verticalAlign: 'top' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <td style={{ padding: '18px 20px', verticalAlign: 'top' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           <div style={{ fontSize: '14px', color: colors.slate700 }}>
                             <span style={{ fontWeight: 500, color: colors.slate500 }}>Name: </span>
                             <span style={{ fontWeight: 700, color: colors.slate900, fontSize: '15px' }}>{lead.name}</span>
                           </div>
-                          <div style={{ fontSize: '14px', color: colors.slate700 }}>
+                          <div style={{ fontSize: '13px', color: colors.slate700, wordBreak: 'break-all' }}>
                             <span style={{ fontWeight: 500, color: colors.slate500 }}>Email: </span>
                             <span style={{ color: colors.emerald600, fontWeight: 500 }}>{lead.email}</span>
                           </div>
-                          <div style={{ fontSize: '14px', color: colors.slate700 }}>
+                          <div style={{ fontSize: '13px', color: colors.slate700 }}>
                             <span style={{ fontWeight: 500, color: colors.slate500 }}>Phone Number: </span>
                             <span style={{ color: colors.slate800, fontWeight: 600 }}>{lead.phone}</span>
                           </div>
                         </div>
                       </td>
-                      <td style={{ padding: '24px', maxWidth: isTablet ? '220px' : '380px', verticalAlign: 'top' }}>
+                      <td style={{ padding: '18px 20px', verticalAlign: 'top' }}>
                         <div 
                           style={{ 
                             color: colors.slate700, 
@@ -530,7 +523,7 @@ export default function App() {
                             wordBreak: 'break-word',
                             lineHeight: '1.5',
                             display: '-webkit-box',
-                            WebkitLineClamp: 3,
+                            WebkitLineClamp: 4,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis'
@@ -540,7 +533,7 @@ export default function App() {
                           {lead.message || "—"}
                         </div>
                       </td>
-                      <td style={{ padding: '24px', verticalAlign: 'top' }}>
+                      <td style={{ padding: '18px 20px', verticalAlign: 'top' }}>
                         <span style={{
                           backgroundColor: badge.bg,
                           color: badge.text,
@@ -551,12 +544,13 @@ export default function App() {
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '6px',
-                          marginTop: '2px'
+                          marginTop: '2px',
+                          whiteSpace: 'nowrap'
                         }}>
                           {badge.icon} {lead.status}
                         </span>
                       </td>
-                      <td style={{ padding: '24px', textAlign: 'right', verticalAlign: 'top' }}>
+                      <td style={{ padding: '18px 20px', textAlign: 'right', verticalAlign: 'top' }}>
                         <select 
                           value={lead.status} 
                           onChange={(e) => updateStatus(lead.id, e.target.value)} 
